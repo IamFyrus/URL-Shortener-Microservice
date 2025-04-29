@@ -23,19 +23,23 @@ app.get('/api/hello', (req, res) => {
 
 app.post('/api/shorturl', (req, res) => {
   const original_url = req.body.url;
+  console.log('Received URL:', original_url); // Debug
 
   try {
     const urlObj = new URL(original_url);
     dns.lookup(urlObj.hostname, (err) => {
       if (err) {
+        console.error('DNS Lookup Failed:', err.message);
         return res.json({ error: 'invalid url' });
       } else {
         const shortUrl = Math.floor(Math.random() * 1000000);
         urlDatabase[shortUrl] = original_url;
-        res.json({ original_url, short_url: shortUrl });
+        console.log('Stored:', { original_url, short_url: shortUrl });
+        return res.json({ original_url, short_url: shortUrl });
       }
     });
-  } catch {
+  } catch (e) {
+    console.error('Invalid URL:', e.message);
     return res.json({ error: 'invalid url' });
   }
 });
